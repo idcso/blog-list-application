@@ -55,4 +55,23 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const comment = request.body.comment
+
+  if (!comment) {
+    return response.status(400).end()
+  }
+
+  const blog = await Blog.findById(request.params.id)
+  const comments = blog.comments.push(comment)
+  
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { ...blog, comments },
+    { new: true }
+  )
+
+  response.status(201).json(updatedBlog)
+})
+
 module.exports = blogsRouter
